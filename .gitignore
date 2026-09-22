@@ -1,1 +1,7 @@
 /target
+.env
+token.ps1
+resultado.txt
+debug.html
+products.json
+!products.json.example
