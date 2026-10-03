@@ -11,8 +11,8 @@ struct Producto {
     precio_anterior: f64,
 }
 
-const TELEGRAM_TOKEN: &str = "TU_TOKEN_AQUI";
-const TELEGRAM_CHAT_ID: &str = "TU_CHAT_ID_AQUI";
+fn telegram_token() -> String { std::env::var("TELEGRAM_TOKEN").expect("Falta la variable TELEGRAM_TOKEN") }
+fn telegram_chat_id() -> String { std::env::var("TELEGRAM_CHAT_ID").expect("Falta la variable TELEGRAM_CHAT_ID") }
 
 fn cargar_productos() -> Vec<Producto> {
     let contenido = fs::read_to_string("products.json")
@@ -62,12 +62,12 @@ fn obtener_precio(url: &str, selector_texto: &str) -> Option<f64> {
 fn enviar_telegram(mensaje: &str) {
     let url = format!(
         "https://api.telegram.org/bot{}/sendMessage",
-        TELEGRAM_TOKEN
+        telegram_token()
     );
     let cliente = reqwest::blocking::Client::new();
     let _ = cliente
         .post(&url)
-        .form(&[("chat_id", TELEGRAM_CHAT_ID), ("text", mensaje)])
+        .form(&[("chat_id", telegram_chat_id().as_str()), ("text", mensaje)])
         .send();
 }
 
