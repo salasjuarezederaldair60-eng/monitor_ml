@@ -11,12 +11,15 @@ struct Producto {
     precio_anterior: f64,
 }
 
-fn telegram_token() -> String { std::env::var("TELEGRAM_TOKEN").expect("Falta la variable TELEGRAM_TOKEN") }
-fn telegram_chat_id() -> String { std::env::var("TELEGRAM_CHAT_ID").expect("Falta la variable TELEGRAM_CHAT_ID") }
+fn telegram_token() -> String {
+    std::env::var("TELEGRAM_TOKEN").expect("Falta la variable TELEGRAM_TOKEN")
+}
+fn telegram_chat_id() -> String {
+    std::env::var("TELEGRAM_CHAT_ID").expect("Falta la variable TELEGRAM_CHAT_ID")
+}
 
 fn cargar_productos() -> Vec<Producto> {
-    let contenido = fs::read_to_string("products.json")
-        .expect("No se pudo leer products.json");
+    let contenido = fs::read_to_string("products.json").expect("No se pudo leer products.json");
     serde_json::from_str(&contenido).expect("JSON invalido")
 }
 
@@ -31,7 +34,7 @@ fn limpiar_numero(texto: &str) -> Option<f64> {
         .filter(|c| c.is_ascii_digit() || *c == '.' || *c == ',')
         .collect();
     let limpio = limpio.replace(',', "");
-    limpio.parse::<f64>().ok()
+    limpio.trim_matches('.').parse::<f64>().ok()
 }
 
 fn obtener_precio(url: &str, selector_texto: &str) -> Option<f64> {
@@ -93,7 +96,10 @@ fn main() {
 
                     producto.precio_anterior = precio_actual;
                 }
-                None => println!("No se pudo obtener el precio de {} (revisar selector CSS)", producto.nombre),
+                None => println!(
+                    "No se pudo obtener el precio de {} (revisar selector CSS)",
+                    producto.nombre
+                ),
             }
         }
 
@@ -101,5 +107,34 @@ fn main() {
 
         println!("Esperando 30 minutos para la proxima revision...");
         thread::sleep(Duration::from_secs(30 * 60));
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn quita_simbolo_y_separador_de_miles() {
+        assert_eq!(limpiar_numero("$1,299.99"), Some(1299.99));
+    }
+
+    #[test]
+    fn numero_entero_simple() {
+        assert_eq!(limpiar_numero("199"), Some(199.0));
+    }
+
+    #[test]
+    fn ignora_texto_alrededor() {
+        assert_eq!(limpiar_numero("Precio: $ 2,499"), Some(2499.0));
+    }
+
+    #[test]
+    fn texto_sin_numeros_da_none() {
+        assert_eq!(limpiar_numero("Agotado"), None);
+    }
+
+    #[test]
+    fn punto_final_despues_del_precio() {
+        assert_eq!(limpiar_numero("$1,299.99."), Some(1299.99));
     }
 }
