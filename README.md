@@ -1,73 +1,73 @@
 # Monitor_ml
 
-Monitor de precios en Rust que vigila productos y avisa por Telegram cuando bajan de precio. Es configurable: no depende de una sola tienda, sino de las URLs y selectores CSS que cargues en `products.json`.
+Price monitor written in Rust that tracks products and sends a Telegram alert when their price drops. It is configurable: it does not depend on a single store, only on the URLs and CSS selectors you define in `products.json`.
 
-## Características
+## Features
 
-- Revisión periódica de precios (cada 30 minutos)
-- Aviso por Telegram con precio anterior, precio actual y enlace
-- Varios productos a la vez, definidos en un archivo JSON
-- Guarda el último precio visto en el mismo archivo
+- Periodic price checks (every 30 minutes)
+- Telegram alert with the previous price, current price, and link
+- Multiple products at once, defined in a JSON file
+- Saves the last seen price in the same file
 
-## Requisitos
+## Requirements
 
-- [Rust](https://www.rust-lang.org/tools/install) y Cargo
-- Un bot de Telegram (token) y tu chat ID
-  - Crea el bot con [@BotFather](https://t.me/BotFather)
-  - Obtén tu chat ID con [@userinfobot](https://t.me/userinfobot)
+- [Rust](https://www.rust-lang.org/tools/install) and Cargo
+- A Telegram bot (token) and your chat ID
+  - Create the bot with [@BotFather](https://t.me/BotFather)
+  - Get your chat ID with [@userinfobot](https://t.me/userinfobot)
 
-## Instalación
+## Installation
 
 ```bash
-git clone https://github.com/salasjuarezederaldair60-eng/Monitor_ml.git
-cd Monitor_ml
+git clone https://github.com/salasjuarezederaldair60-eng/monitor_ml.git
+cd monitor_ml
 cargo build --release
 ```
 
-## Configuración
+## Configuration
 
-1. Define el token y el chat ID como variables de entorno (no van en ningún archivo):
+1. Set the token and chat ID as environment variables (they are not stored in any file):
 
 ```powershell
 # Windows (PowerShell)
-$env:TELEGRAM_TOKEN="tu_token"
-$env:TELEGRAM_CHAT_ID="tu_chat_id"
+$env:TELEGRAM_TOKEN="your_token"
+$env:TELEGRAM_CHAT_ID="your_chat_id"
 ```
 
 ```bash
 # Linux / macOS
-export TELEGRAM_TOKEN="tu_token"
-export TELEGRAM_CHAT_ID="tu_chat_id"
+export TELEGRAM_TOKEN="your_token"
+export TELEGRAM_CHAT_ID="your_chat_id"
 ```
 
-2. Crea `products.json` en la raíz del proyecto:
+2. Create `products.json` in the project root:
 
 ```json
 [
   {
-    "url": "https://ejemplo.com/producto/12345",
-    "nombre": "Mi producto",
-    "selector": ".precio",
+    "url": "https://example.com/product/1",
+    "nombre": "My product",
+    "selector": ".price",
     "precio_anterior": 0.0
   }
 ]
 ```
 
-Los cuatro campos son obligatorios:
+All four fields are required:
 
-- `url`: página del producto
-- `nombre`: cómo aparecerá en la alerta
-- `selector`: selector CSS del elemento que contiene el precio
-- `precio_anterior`: empieza en `0.0`; el programa lo actualiza solo
+- `url`: product page
+- `nombre`: product name shown in the alert
+- `selector`: CSS selector of the element that contains the price
+- `precio_anterior`: starts at `0.0`; the program updates it automatically
 
-## Uso
+## Usage
 
 ```bash
 cargo run --release
 ```
 
-En la primera revisión solo guarda el precio. En las siguientes, si el precio es menor que el anterior, envía la alerta a Telegram.
+On the first check, it only saves the price. On later checks, if the price is lower than the previous one, it sends an alert to Telegram.
 
-## Estado
+## Status
 
-Funcional en su versión básica. Próximas mejoras planeadas: soporte para más fuentes de datos, panel de configuración más simple, historial de precios.
+Working in its basic version. Planned improvements: support for more data sources, a simpler configuration panel, and price history.
